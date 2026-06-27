@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AirBNB Planlegger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============== ON-SCREEN APP (hidden when printing) ============== -->
+<div class="app" id="app">
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="topbar__mark">&#10003;</span>
+      <div>
+        <h1 class="topbar__title">AirBNB Planlegger</h1>
+        <p class="topbar__subtitle">Vaskeplan for deg og renholderen</p>
+      </div>
+    </div>
+
+    <div class="topbar__deadline">
+      <label for="deadline-date">Gjestenes ankomstdato</label>
+      <input type="date" id="deadline-date" required>
+    </div>
+  </header>
+
+  <nav class="viewtabs" role="tablist" aria-label="Velg visning">
+    <button class="viewtabs__btn is-active" data-view="category" role="tab" aria-selected="true">Romvisning</button>
+    <button class="viewtabs__btn" data-view="timeline" role="tab" aria-selected="false">Tidslinje</button>
+  </nav>
+
+  <div class="toolbar">
+    <div class="toolbar__group">
+      <input type="search" id="search-input" placeholder="Søk i oppgaver..." aria-label="Søk i oppgaver">
+    </div>
+
+    <div class="toolbar__group">
+      <select id="priority-filter" aria-label="Filtrer etter prioritet">
+        <option value="all">Alle prioriteringer</option>
+        <option value="Kritisk">Kun kritisk</option>
+        <option value="Normal">Kun normal</option>
+        <option value="Valgfri">Kun valgfri</option>
+      </select>
+    </div>
+
+    <div class="toolbar__group toolbar__check">
+      <label>
+        <input type="checkbox" id="show-completed-toggle">
+        Vis fullførte
+      </label>
+    </div>
+
+    <div class="toolbar__group toolbar__check" id="show-date-group">
+      <label>
+        <input type="checkbox" id="show-date-toggle" checked>
+        Vis dato
+      </label>
+    </div>
+
+    <div class="toolbar__group toolbar__check" id="show-meg-group">
+      <label>
+        <input type="checkbox" id="show-meg-toggle">
+        Vis Meg
+      </label>
+    </div>
+
+    <div class="toolbar__group toolbar__spacer"></div>
+
+    <div class="toolbar__group toolbar__layout" role="group" aria-label="Layout for visning">
+      <button class="btn btn--ghost is-active" id="layout-horizontal-btn" type="button">Horisontal</button>
+      <button class="btn btn--ghost" id="layout-vertical-btn" type="button">Vertikal</button>
+    </div>
+
+    <div class="toolbar__group">
+      <button class="btn btn--ghost" id="add-task-btn">Lag ny oppgave</button>
+    </div>
+
+    <div class="toolbar__group toolbar__print">
+      <button class="btn btn--ghost" id="print-category-btn">Skriv ut romvisning</button>
+      <button class="btn btn--ghost" id="print-timeline-btn">Skriv ut tidslinje</button>
+    </div>
+  </div>
+
+  <main class="board" id="board"><!-- columns injected by app.js --></main>
+
+  <footer class="footer-note">
+    <span id="task-count-summary"></span>
+    &nbsp;&middot;&nbsp;
+    Endringer lagres automatisk lokalt i nettleseren. Permanente oppgaver lagres i <code>data.py</code>.
+    <button class="btn btn--text" id="reset-btn">Tilbakestill til standard</button>
+  </footer>
+</div>
+
+<div class="date-gate" id="date-gate" aria-hidden="true">
+  <div class="date-gate__card">
+    <h2>Velg ankomstdato</h2>
+    <p>Du må velge dato for når gjestene ankommer før planleggingen kan starte.</p>
+    <input type="date" id="required-date-input" required>
+    <button class="btn btn--small" id="required-date-save">Start planlegging</button>
+  </div>
+</div>
+
+<div class="task-modal" id="task-modal" aria-hidden="true">
+  <div class="task-modal__card" role="dialog" aria-modal="true" aria-labelledby="new-task-title">
+    <h2 id="new-task-title">Lag ny oppgave</h2>
+
+    <label class="task-modal__label" for="new-task-name">Navn på oppgave</label>
+    <input type="text" id="new-task-name" placeholder="F.eks. Vask vinduer" maxlength="160">
+
+    <div class="task-modal__row">
+      <div>
+        <label class="task-modal__label" for="new-task-category">Rom</label>
+        <select id="new-task-category"></select>
+      </div>
+      <div>
+        <label class="task-modal__label" for="new-task-day">Dag</label>
+        <select id="new-task-day"></select>
+      </div>
+    </div>
+
+    <div>
+      <label class="task-modal__label" for="new-task-assignee">Ansvarlig (valgfritt)</label>
+      <select id="new-task-assignee">
+        <option value="">Ikke satt</option>
+        <option value="Meg">Meg</option>
+        <option value="Vasker">Vasker</option>
+      </select>
+    </div>
+
+    <label class="task-modal__check">
+      <input type="checkbox" id="new-task-permanent">
+      Lagre som permanent oppgave
+    </label>
+
+    <div class="task-modal__actions">
+      <button class="btn btn--ghost" type="button" id="new-task-cancel">Avbryt</button>
+      <button class="btn btn--small" type="button" id="new-task-save">Lagre oppgave</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============== PRINT-ONLY CONTENT (hidden on screen) ============== -->
+<div class="print-only" id="print-category-sheet">
+  <h1 class="print-title">Vaskeplan - etter rom</h1>
+  <p class="print-subtitle" id="print-category-date"></p>
+  <div id="print-category-body"><!-- injected --></div>
+</div>
+
+<div class="print-only" id="print-timeline-sheet">
+  <h1 class="print-title">Vaskeplan - tidslinje</h1>
+  <p class="print-subtitle" id="print-timeline-date"></p>
+  <div id="print-timeline-body"><!-- injected --></div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
