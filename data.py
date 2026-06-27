@@ -14,6 +14,9 @@ categories = [
 ]
 
 days = [
+    "7 dager før gjester ankommer",
+    "6 dager før gjester ankommer",
+    "5 dager før gjester ankommer",
     "4 dager før gjester ankommer",
     "3 dager før gjester ankommer",
     "2 dager før gjester ankommer",

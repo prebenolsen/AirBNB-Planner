@@ -11,6 +11,9 @@ const DEFAULT_DATA = {
     "Alle rom"
   ],
   "days": [
+    "7 dager f\u00f8r gjester ankommer",
+    "6 dager f\u00f8r gjester ankommer",
+    "5 dager f\u00f8r gjester ankommer",
     "4 dager f\u00f8r gjester ankommer",
     "3 dager f\u00f8r gjester ankommer",
     "2 dager f\u00f8r gjester ankommer",

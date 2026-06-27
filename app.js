@@ -4,6 +4,8 @@
 // =====================================================================
 
 const STORAGE_KEY = "airbnbPlannerState_v2_no";
+const PROJECTS_KEY = "airbnbPlannerProjects_v1";
+const ACTIVE_PROJECT_KEY = "airbnbPlannerActiveProject_v1";
 const UDEFINERT_ROM = "Alle rom";
 const UDEFINERT_DAG = "Uten dag";
 
@@ -21,6 +23,136 @@ let state = {
 
 let editingTaskId = null;
 let draggedTaskId = null;
+let projects = [];
+let activeProjectId = "";
+
+function loadProjects() {
+  try {
+    const raw = localStorage.getItem(PROJECTS_KEY);
+    projects = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(projects)) projects = [];
+  } catch (e) {
+    projects = [];
+    console.warn("Kunne ikke lese prosjekter.", e);
+  }
+
+  try {
+    activeProjectId = localStorage.getItem(ACTIVE_PROJECT_KEY) || "";
+  } catch (e) {
+    activeProjectId = "";
+  }
+}
+
+function saveProjects() {
+  localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+  localStorage.setItem(ACTIVE_PROJECT_KEY, activeProjectId || "");
+}
+
+function projectLabel(project) {
+  if (project.name && project.name.trim()) return project.name;
+  if (project.deadlineDate) return `Ankomst ${project.deadlineDate}`;
+  return `Prosjekt ${project.id}`;
+}
+
+function updateProjectSelectUI() {
+  const select = document.getElementById("project-select");
+  if (!select) return;
+
+  const sorted = [...projects].sort((a, b) => {
+    const ta = a.savedAt || "";
+    const tb = b.savedAt || "";
+    return tb.localeCompare(ta);
+  });
+
+  select.innerHTML = `<option value="">Velg prosjekt...</option>`;
+  sorted.forEach((p) => {
+    const option = document.createElement("option");
+    option.value = p.id;
+    option.textContent = projectLabel(p);
+    select.appendChild(option);
+  });
+
+  if (activeProjectId && sorted.some((p) => p.id === activeProjectId)) {
+    select.value = activeProjectId;
+  } else {
+    select.value = "";
+  }
+}
+
+function currentStateForProject() {
+  return {
+    tasks: JSON.parse(JSON.stringify(state.tasks)),
+    deadlineDate: state.deadlineDate,
+    view: state.view,
+    layoutMode: state.layoutMode,
+    showDateMetadata: state.showDateMetadata,
+  };
+}
+
+function saveCurrentProject() {
+  const select = document.getElementById("project-select");
+  const selected = select ? select.value : "";
+  const now = new Date().toISOString();
+
+  let project = selected ? projects.find((p) => p.id === selected) : null;
+  if (!project) {
+    const id = `p-${Date.now().toString(36)}`;
+    const autoName = state.deadlineDate ? `Ankomst ${state.deadlineDate}` : `Prosjekt ${new Date().toLocaleDateString("nb-NO")}`;
+    project = { id, name: autoName };
+    projects.push(project);
+  }
+
+  Object.assign(project, currentStateForProject(), {
+    name: state.deadlineDate ? `Ankomst ${state.deadlineDate}` : project.name,
+    savedAt: now,
+  });
+
+  activeProjectId = project.id;
+  saveProjects();
+  updateProjectSelectUI();
+  window.alert("Prosjekt lagret.");
+}
+
+function loadSelectedProject() {
+  const select = document.getElementById("project-select");
+  const selected = select ? select.value : "";
+  if (!selected) {
+    window.alert("Velg et prosjekt først.");
+    return;
+  }
+
+  const project = projects.find((p) => p.id === selected);
+  if (!project) {
+    window.alert("Prosjektet ble ikke funnet.");
+    return;
+  }
+
+  state.tasks = JSON.parse(JSON.stringify(project.tasks || []));
+  state.tasks = state.tasks.map((t) => ({ ...t, assignee: t.assignee || "" }));
+  state.deadlineDate = project.deadlineDate || "";
+  state.view = project.view || "category";
+  state.layoutMode = project.layoutMode === "vertical" ? "vertical" : "horizontal";
+  state.showDateMetadata = project.showDateMetadata !== false;
+  editingTaskId = null;
+
+  activeProjectId = project.id;
+  saveState();
+  saveProjects();
+
+  document.getElementById("deadline-date").value = state.deadlineDate || "";
+  document.getElementById("required-date-input").value = state.deadlineDate || "";
+
+  document.querySelectorAll(".viewtabs__btn").forEach((b) => {
+    const active = b.dataset.view === state.view;
+    b.classList.toggle("is-active", active);
+    b.setAttribute("aria-selected", active ? "true" : "false");
+  });
+
+  updateLayoutModeUI();
+  updateShowDateToggleUI();
+  ensureDateGate();
+  renderBoard();
+}
 
 function loadState() {
   let saved = null;
@@ -199,8 +331,10 @@ function ensureDateGate() {
 function renderBoard() {
   const board = document.getElementById("board");
   board.innerHTML = "";
-  board.classList.remove("board--layout-horizontal", "board--layout-vertical");
+  board.classList.remove("board--layout-horizontal", "board--layout-vertical", "board--view-category", "board--view-timeline", "board--dragging");
   board.classList.add(state.layoutMode === "vertical" ? "board--layout-vertical" : "board--layout-horizontal");
+  board.classList.add(state.view === "timeline" ? "board--view-timeline" : "board--view-category");
+  if (draggedTaskId) board.classList.add("board--dragging");
 
   columnKeysForView().forEach((key) => {
     board.appendChild(renderColumn(key));
@@ -231,6 +365,9 @@ function renderColumn(key) {
 
   const visibleTasks = tasksInColumn(key);
   const totalInColumn = state.tasks.filter((t) => taskMatchesColumn(t, key)).length;
+  if (state.view === "timeline" && totalInColumn === 0) {
+    col.classList.add("column--unused");
+  }
 
   const title = state.view === "timeline" && key !== UDEFINERT_DAG ? labelWithDate(key) : key;
 
@@ -246,7 +383,9 @@ function renderColumn(key) {
   if (visibleTasks.length === 0) {
     const empty = document.createElement("p");
     empty.className = "column__empty";
-    empty.textContent = totalInColumn === 0 ? "Ingen oppgaver her ennå." : "Ingen treff med nåværende filter.";
+    empty.textContent = totalInColumn === 0
+      ? (state.view === "timeline" && draggedTaskId ? "Tom dag - slipp oppgaven her." : "Ingen oppgaver her ennå.")
+      : "Ingen treff med nåværende filter.";
     list.appendChild(empty);
   } else {
     visibleTasks.forEach((task) => list.appendChild(renderTaskCard(task)));
@@ -309,12 +448,14 @@ function renderTaskCard(task) {
     card.addEventListener("dragstart", (e) => {
       draggedTaskId = task.id;
       card.classList.add("is-dragging");
+      document.getElementById("board")?.classList.add("board--dragging");
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("text/plain", task.id);
     });
     card.addEventListener("dragend", () => {
       card.classList.remove("is-dragging");
       draggedTaskId = null;
+      document.getElementById("board")?.classList.remove("board--dragging");
     });
   }
 
@@ -552,6 +693,7 @@ function attachColumnDnd(listEl, columnKey) {
   listEl.addEventListener("drop", (e) => {
     e.preventDefault();
     listEl.closest(".column").classList.remove("is-dragover");
+    document.getElementById("board")?.classList.remove("board--dragging");
     if (!draggedTaskId) return;
 
     const task = state.tasks.find((t) => t.id === draggedTaskId);
@@ -645,6 +787,19 @@ function setupToolbar() {
   document.getElementById("show-meg-toggle").addEventListener("change", (e) => {
     state.filters.showMeg = e.target.checked;
     renderBoard();
+  });
+
+  document.getElementById("save-project-btn").addEventListener("click", () => {
+    saveCurrentProject();
+  });
+
+  document.getElementById("load-project-btn").addEventListener("click", () => {
+    loadSelectedProject();
+  });
+
+  document.getElementById("project-select").addEventListener("change", (e) => {
+    activeProjectId = e.target.value || "";
+    saveProjects();
   });
 
   document.getElementById("deadline-date").addEventListener("change", (e) => {
@@ -801,8 +956,10 @@ window.addEventListener("afterprint", () => {
 });
 
 function init() {
+  loadProjects();
   loadState();
   setupToolbar();
+  updateProjectSelectUI();
   updateLayoutModeUI();
   updateShowDateToggleUI();
 

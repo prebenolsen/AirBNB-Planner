@@ -153,6 +153,14 @@ button{ cursor: pointer; }
 }
 #search-input{ width: 220px; }
 
+#project-select{
+  border: 1px solid var(--line-strong);
+  background: var(--paper-card);
+  border-radius: 7px;
+  padding: 7px 11px;
+  min-width: 190px;
+}
+
 .btn{
   border-radius: 7px;
   border: 1px solid transparent;
@@ -342,6 +350,15 @@ button{ cursor: pointer; }
   flex-direction:column;
   max-height: none;
   overflow: visible;
+}
+
+.board--view-timeline .column--unused{
+  display: none;
+}
+
+.board--view-timeline.board--dragging .column--unused{
+  display: flex;
+  order: -1;
 }
 
 .column.is-dragover{
