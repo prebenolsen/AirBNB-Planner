@@ -353,10 +353,21 @@ button{ cursor: pointer; }
 }
 
 .board--view-timeline .column--unused{
-  display: none;
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .board--view-timeline.board--dragging .column--unused{
+  position: relative;
+  width: 100%;
+  height: auto;
+  opacity: 1;
+  overflow: visible;
+  pointer-events: auto;
   display: flex;
   order: -1;
 }

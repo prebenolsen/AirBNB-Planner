@@ -11,6 +11,8 @@ categories = [
     "Kjøkken",
     "Bod",
     "Alle rom",
+    "Shopping",
+    "Misc",
 ]
 
 days = [
@@ -54,16 +56,16 @@ def add_task(title, category, day, priority="Normal", notes="", assignee=""):
 
 
 # Kjøkken
-add_task("Rydd kjøleskap", "Kjøkken", "2 dager før gjester ankommer", assignee="Meg")
-add_task("Rydd fryser", "Kjøkken", "2 dager før gjester ankommer", assignee="Meg")
-add_task("Rydd kjøkkenskap", "Kjøkken", "2 dager før gjester ankommer")
+add_task("Rydd kjøleskap", "Kjøkken", "3 dager før gjester ankommer", assignee="Meg")
+add_task("Rydd fryser", "Kjøkken", "3 dager før gjester ankommer", assignee="Meg")
+add_task("Rydd kjøkkenskap", "Kjøkken", "3 dager før gjester ankommer")
 add_task("Tøm oppvaskmaskin", "Kjøkken", "1 dag før gjester ankommer")
-add_task("Vask kjøleskap", "Kjøkken", "1 dag før gjester ankommer")
-add_task("Vask fryser", "Kjøkken", "1 dag før gjester ankommer")
-add_task("Vask kjøkkenskap", "Kjøkken", "1 dag før gjester ankommer")
+add_task("Vask kjøleskap", "Kjøkken", "3 dager før gjester ankommer")
+add_task("Vask fryser", "Kjøkken", "3 dager før gjester ankommer")
+add_task("Vask kjøkkenskap", "Kjøkken", "3 dager før gjester ankommer")
 add_task("Vask overflater (inkl. skapdører)", "Kjøkken", "1 dag før gjester ankommer")
 add_task("Vask kjøkkenutstyr (skuff 1 og 2)", "Kjøkken", "1 dag før gjester ankommer")
-add_task("Vask fat og skåler", "Kjøkken", "1 dag før gjester ankommer")
+add_task("Vask fat og skåler", "Kjøkken", "2 dager før gjester ankommer")
 add_task("Vask kaffemaskin", "Kjøkken", "1 dag før gjester ankommer", notes="Rensevæske under vasken")
 add_task("Vask airfryer", "Kjøkken", "1 dag før gjester ankommer")
 
@@ -101,21 +103,29 @@ add_task("Vask oppbevaringshylle", "Bad", "1 dag før gjester ankommer")
 add_task("Vask dusjområde", "Bad", "1 dag før gjester ankommer")
 add_task("Steam dusjområde", "Bad", "1 dag før gjester ankommer")
 add_task("Vask dusjforheng", "Bad", "1 dag før gjester ankommer")
-add_task("Fyll opp toalettsaker", "Bad", "1 dag før gjester ankommer")
+
+# Shopping
+add_task("Lag handleliste", "Shopping", "4 dager før gjester ankommer")
+add_task("Handle inn", "Shopping", "2 dager før gjester ankommer")
+
+# Misc
+add_task("Status på sengetøy og håndkler", "Misc", "4 dager før gjester ankommer",assignee="Meg")
+add_task("Vaske sengetøy og håndkler", "Misc", "4 dager før gjester ankommer", assignee="Meg")
+add_task("Hente ned sommerklær", "Misc", "4 dager før gjester ankommer", assignee="Meg")
 
 
 # Bod
 add_task(
     "Fjern private klær",
     "Bod",
-    "2 dager før gjester ankommer",
+    "3 dager før gjester ankommer",
     assignee="Meg"
 )
 
 add_task(
     "Fjern verdisaker (alkohol, penger, nøkler, utility closet)",
     "Bod",
-    "2 dager før gjester ankommer",
+    "3 dager før gjester ankommer",
     priority="Kritisk",
     assignee="Meg"
 )

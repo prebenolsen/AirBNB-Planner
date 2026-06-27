@@ -448,7 +448,7 @@ function renderTaskCard(task) {
       el.addEventListener("dragstart", (e) => e.preventDefault());
     });
 
-    title.addEventListener("click", () => {
+    title.addEventListener("dblclick", () => {
       if (Date.now() < suppressTitleClickUntil) return;
       editingTaskId = task.id;
       renderBoard();
@@ -459,7 +459,8 @@ function renderTaskCard(task) {
     });
 
     card.addEventListener("dragstart", (e) => {
-      if (e.target && e.target.closest("input, button, select, textarea")) {
+      const targetEl = e.target instanceof Element ? e.target : null;
+      if (targetEl && targetEl.closest("input, button, select, textarea")) {
         e.preventDefault();
         return;
       }
@@ -704,6 +705,13 @@ async function savePermanentTask(task) {
 function attachColumnDnd(listEl, columnKey) {
   listEl.addEventListener("dragover", (e) => {
     e.preventDefault();
+    if (!draggedTaskId) {
+      const maybeId = e.dataTransfer?.getData("text/plain");
+      if (maybeId) draggedTaskId = maybeId;
+    }
+    if (draggedTaskId) {
+      document.getElementById("board")?.classList.add("board--dragging");
+    }
     listEl.closest(".column").classList.add("is-dragover");
   });
   listEl.addEventListener("dragleave", () => {
@@ -713,9 +721,10 @@ function attachColumnDnd(listEl, columnKey) {
     e.preventDefault();
     listEl.closest(".column").classList.remove("is-dragover");
     document.getElementById("board")?.classList.remove("board--dragging");
-    if (!draggedTaskId) return;
+    const dragId = draggedTaskId || e.dataTransfer?.getData("text/plain");
+    if (!dragId) return;
 
-    const task = state.tasks.find((t) => t.id === draggedTaskId);
+    const task = state.tasks.find((t) => t.id === dragId);
     if (!task) return;
 
     const cards = Array.from(listEl.querySelectorAll(".task-card"));
@@ -748,6 +757,7 @@ function attachColumnDnd(listEl, columnKey) {
       t.order = i + 1;
     });
 
+    draggedTaskId = null;
     saveState();
     renderBoard();
   });
