@@ -361,6 +361,7 @@ button{ cursor: pointer; }
   pointer-events: none;
 }
 
+.board--view-timeline.board--move-mode .column--unused,
 .board--view-timeline.board--dragging .column--unused{
   position: relative;
   width: 100%;
@@ -370,6 +371,10 @@ button{ cursor: pointer; }
   pointer-events: auto;
   display: flex;
   order: -1;
+}
+
+.toolbar__move .btn{
+  white-space: nowrap;
 }
 
 .column.is-dragover{

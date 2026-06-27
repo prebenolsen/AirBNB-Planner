@@ -23,8 +23,54 @@ let state = {
 
 let editingTaskId = null;
 let draggedTaskId = null;
+let moveModeActive = false;
+let moveDraftTasksBackup = null;
 let projects = [];
 let activeProjectId = "";
+
+function updateMoveModeUI() {
+  const moveBtn = document.getElementById("move-mode-btn");
+  const saveBtn = document.getElementById("move-save-btn");
+  const cancelBtn = document.getElementById("move-cancel-btn");
+  if (!moveBtn || !saveBtn || !cancelBtn) return;
+
+  moveBtn.classList.toggle("is-active", moveModeActive);
+  moveBtn.textContent = moveModeActive ? "Flytting aktiv" : "Flytt oppgaver";
+  saveBtn.hidden = !moveModeActive;
+  cancelBtn.hidden = !moveModeActive;
+}
+
+function startMoveMode() {
+  if (moveModeActive) return;
+  moveDraftTasksBackup = JSON.parse(JSON.stringify(state.tasks));
+  moveModeActive = true;
+  editingTaskId = null;
+  draggedTaskId = null;
+  updateMoveModeUI();
+  renderBoard();
+}
+
+function saveMoveMode() {
+  if (!moveModeActive) return;
+  moveModeActive = false;
+  moveDraftTasksBackup = null;
+  draggedTaskId = null;
+  saveState();
+  updateMoveModeUI();
+  renderBoard();
+}
+
+function cancelMoveMode() {
+  if (!moveModeActive) return;
+  if (moveDraftTasksBackup) {
+    state.tasks = JSON.parse(JSON.stringify(moveDraftTasksBackup));
+  }
+  moveModeActive = false;
+  moveDraftTasksBackup = null;
+  draggedTaskId = null;
+  updateMoveModeUI();
+  renderBoard();
+}
 
 function loadProjects() {
   try {
@@ -228,6 +274,7 @@ function formatDateForDay(dayLabel) {
   const d = new Date(state.deadlineDate + "T00:00:00");
   d.setDate(d.getDate() - offset);
   return d.toLocaleDateString("nb-NO", {
+    weekday: "long",
     day: "numeric",
     month: "long",
   });
@@ -331,9 +378,10 @@ function ensureDateGate() {
 function renderBoard() {
   const board = document.getElementById("board");
   board.innerHTML = "";
-  board.classList.remove("board--layout-horizontal", "board--layout-vertical", "board--view-category", "board--view-timeline", "board--dragging");
+  board.classList.remove("board--layout-horizontal", "board--layout-vertical", "board--view-category", "board--view-timeline", "board--dragging", "board--move-mode");
   board.classList.add(state.layoutMode === "vertical" ? "board--layout-vertical" : "board--layout-horizontal");
   board.classList.add(state.view === "timeline" ? "board--view-timeline" : "board--view-category");
+  if (moveModeActive) board.classList.add("board--move-mode");
   if (draggedTaskId) board.classList.add("board--dragging");
 
   columnKeysForView().forEach((key) => {
@@ -384,7 +432,7 @@ function renderColumn(key) {
     const empty = document.createElement("p");
     empty.className = "column__empty";
     empty.textContent = totalInColumn === 0
-      ? (state.view === "timeline" && draggedTaskId ? "Tom dag - slipp oppgaven her." : "Ingen oppgaver her ennå.")
+      ? (state.view === "timeline" && (moveModeActive || draggedTaskId) ? "Tom dag - slipp oppgaven her." : "Ingen oppgaver her ennå.")
       : "Ingen treff med nåværende filter.";
     list.appendChild(empty);
   } else {
@@ -400,7 +448,7 @@ function renderTaskCard(task) {
   card.className = "task-card" + (task.completed ? " is-completed" : "");
   card.dataset.id = task.id;
   card.dataset.priority = task.priority;
-  card.draggable = true;
+  card.draggable = moveModeActive;
   let suppressTitleClickUntil = 0;
 
   if (task.id === editingTaskId) {
@@ -446,9 +494,11 @@ function renderTaskCard(task) {
     [check, deleteBtn].forEach((el) => {
       el.addEventListener("mousedown", (e) => e.stopPropagation());
       el.addEventListener("dragstart", (e) => e.preventDefault());
+      el.draggable = false;
     });
 
     title.addEventListener("dblclick", () => {
+      if (moveModeActive) return;
       if (Date.now() < suppressTitleClickUntil) return;
       editingTaskId = task.id;
       renderBoard();
@@ -458,7 +508,12 @@ function renderTaskCard(task) {
       deleteTask(task.id);
     });
 
-    card.addEventListener("dragstart", (e) => {
+    const startDrag = (e) => {
+      if (!moveModeActive) {
+        e.preventDefault();
+        return;
+      }
+
       const targetEl = e.target instanceof Element ? e.target : null;
       if (targetEl && targetEl.closest("input, button, select, textarea")) {
         e.preventDefault();
@@ -471,11 +526,30 @@ function renderTaskCard(task) {
       suppressTitleClickUntil = Date.now() + 250;
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("text/plain", task.id);
-    });
-    card.addEventListener("dragend", () => {
+    };
+
+    const endDrag = () => {
       card.classList.remove("is-dragging");
       draggedTaskId = null;
       document.getElementById("board")?.classList.remove("board--dragging");
+    };
+
+    card.addEventListener("dragstart", startDrag);
+    card.addEventListener("dragend", endDrag);
+
+    // Make all visible card content act as drag origin (same feel in both views).
+    const dragSurfaceSelectors = [
+      ".task-card__body",
+      ".task-card__title",
+      ".task-card__badges",
+      ".task-card__notes-preview",
+    ];
+    dragSurfaceSelectors.forEach((selector) => {
+      card.querySelectorAll(selector).forEach((el) => {
+        el.draggable = moveModeActive;
+        el.addEventListener("dragstart", startDrag);
+        el.addEventListener("dragend", endDrag);
+      });
     });
   }
 
@@ -704,13 +778,12 @@ async function savePermanentTask(task) {
 
 function attachColumnDnd(listEl, columnKey) {
   listEl.addEventListener("dragover", (e) => {
+    if (!moveModeActive) return;
     e.preventDefault();
+    document.getElementById("board")?.classList.add("board--dragging");
     if (!draggedTaskId) {
       const maybeId = e.dataTransfer?.getData("text/plain");
       if (maybeId) draggedTaskId = maybeId;
-    }
-    if (draggedTaskId) {
-      document.getElementById("board")?.classList.add("board--dragging");
     }
     listEl.closest(".column").classList.add("is-dragover");
   });
@@ -718,6 +791,7 @@ function attachColumnDnd(listEl, columnKey) {
     listEl.closest(".column").classList.remove("is-dragover");
   });
   listEl.addEventListener("drop", (e) => {
+    if (!moveModeActive) return;
     e.preventDefault();
     listEl.closest(".column").classList.remove("is-dragover");
     document.getElementById("board")?.classList.remove("board--dragging");
@@ -758,7 +832,6 @@ function attachColumnDnd(listEl, columnKey) {
     });
 
     draggedTaskId = null;
-    saveState();
     renderBoard();
   });
 }
@@ -859,6 +932,22 @@ function setupToolbar() {
 
   document.getElementById("add-task-btn").addEventListener("click", () => {
     openTaskModal();
+  });
+
+  document.getElementById("move-mode-btn").addEventListener("click", () => {
+    if (moveModeActive) {
+      saveMoveMode();
+    } else {
+      startMoveMode();
+    }
+  });
+
+  document.getElementById("move-save-btn").addEventListener("click", () => {
+    saveMoveMode();
+  });
+
+  document.getElementById("move-cancel-btn").addEventListener("click", () => {
+    cancelMoveMode();
   });
 
   document.getElementById("new-task-cancel").addEventListener("click", () => {
@@ -991,6 +1080,7 @@ function init() {
   updateProjectSelectUI();
   updateLayoutModeUI();
   updateShowDateToggleUI();
+  updateMoveModeUI();
 
   if (state.deadlineDate) {
     document.getElementById("deadline-date").value = state.deadlineDate;
