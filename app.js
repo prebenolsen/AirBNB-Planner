@@ -401,6 +401,7 @@ function renderTaskCard(task) {
   card.dataset.id = task.id;
   card.dataset.priority = task.priority;
   card.draggable = true;
+  let suppressTitleClickUntil = 0;
 
   if (task.id === editingTaskId) {
     card.classList.add("is-editing");
@@ -431,24 +432,42 @@ function renderTaskCard(task) {
       <button class="btn--icon task-card__delete" title="Slett oppgave" aria-label="Slett oppgave">&times;</button>
     `;
 
-    card.querySelector(".task-card__check").addEventListener("change", (e) => {
+    const check = card.querySelector(".task-card__check");
+    const title = card.querySelector(".task-card__title");
+    const deleteBtn = card.querySelector(".task-card__delete");
+
+    check.addEventListener("change", (e) => {
       task.completed = e.target.checked;
       saveState();
       renderBoard();
     });
-    card.querySelector(".task-card__title").addEventListener("click", () => {
+
+    // Keep interactions on form controls from accidentally starting a drag.
+    [check, deleteBtn].forEach((el) => {
+      el.addEventListener("mousedown", (e) => e.stopPropagation());
+      el.addEventListener("dragstart", (e) => e.preventDefault());
+    });
+
+    title.addEventListener("click", () => {
+      if (Date.now() < suppressTitleClickUntil) return;
       editingTaskId = task.id;
       renderBoard();
     });
-    card.querySelector(".task-card__delete").addEventListener("click", (e) => {
+    deleteBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       deleteTask(task.id);
     });
 
     card.addEventListener("dragstart", (e) => {
+      if (e.target && e.target.closest("input, button, select, textarea")) {
+        e.preventDefault();
+        return;
+      }
+
       draggedTaskId = task.id;
       card.classList.add("is-dragging");
       document.getElementById("board")?.classList.add("board--dragging");
+      suppressTitleClickUntil = Date.now() + 250;
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("text/plain", task.id);
     });

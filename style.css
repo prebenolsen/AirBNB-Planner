@@ -434,6 +434,7 @@ button{ cursor: pointer; }
   cursor: grab;
   max-width: 100%;
   overflow: hidden;
+  user-select: none;
 }
 .task-card[data-priority="Kritisk"]{ border-left-color: var(--critical); }
 .task-card[data-priority="Normal"]{ border-left-color: var(--normal); }
@@ -456,7 +457,7 @@ button{ cursor: pointer; }
 .task-card__title{
   font-weight: 500;
   font-size: 14px;
-  cursor: text;
+  cursor: grab;
   overflow-wrap: anywhere;
 }
 
@@ -490,6 +491,11 @@ button{ cursor: pointer; }
 }
 
 .task-card__delete{ flex: none; }
+
+.task-card__check,
+.task-card__delete{
+  cursor: pointer;
+}
 
 /* --- inline edit mode --- */
 
