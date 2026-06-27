@@ -23,276 +23,97 @@ days = [
 
 priorities = ["Kritisk", "Normal", "Valgfri"]
 
-tasks = [
-    {
-        "id": "task-001",
-        "title": "Fjern alle ikke-sommerklær",
-        "category": "Bod",
-        "day": "4 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 1,
-    },
-    {
-        "id": "task-002",
-        "title": "Hent frem alle sommerklær",
-        "category": "Bod",
-        "day": "4 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 2,
-    },
-    {
-        "id": "task-003",
-        "title": "Vask sommerklær",
-        "category": "Bod",
-        "day": "4 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 3,
-    },
-    {
-        "id": "task-004",
-        "title": "Sjekk status på håndklær og sengetøy",
-        "category": "Soverom",
-        "day": "4 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 4,
-    },
-    {
-        "id": "task-005",
-        "title": "Lag full handleliste",
-        "category": "Alle rom",
-        "day": "4 dager før gjester ankommer",
-        "priority": "Kritisk",
-        "completed": False,
-        "notes": "Shopping",
-        "order": 5,
-    },
-    {
-        "id": "task-006",
-        "title": "Vask kjøkkenutstyr",
-        "category": "Kjøkken",
-        "day": "3 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 1,
-    },
-    {
-        "id": "task-007",
-        "title": "Rydd",
-        "category": "Kjøkken",
-        "day": "3 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 2,
-    },
-    {
-        "id": "task-008",
-        "title": "Rydd gang",
-        "category": "Gang",
-        "day": "3 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 3,
-    },
-    {
-        "id": "task-009",
-        "title": "Rydd",
-        "category": "Soverom",
-        "day": "2 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 1,
-    },
-    {
-        "id": "task-010",
-        "title": "Rydd",
-        "category": "Bad",
-        "day": "2 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 2,
-    },
-    {
-        "id": "task-011",
-        "title": "Rydd stue",
-        "category": "Stue",
-        "day": "2 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 3,
-    },
-    {
-        "id": "task-012",
-        "title": "Vask kluter og håndklær",
-        "category": "Kjøkken",
-        "day": "2 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 4,
-    },
-    {
-        "id": "task-013",
-        "title": "Tom kjøleskap og fryser",
-        "category": "Kjøkken",
-        "day": "2 dager før gjester ankommer",
-        "priority": "Kritisk",
-        "completed": False,
-        "notes": "",
-        "order": 5,
-    },
-    {
-        "id": "task-014",
-        "title": "Fjern alkohol",
-        "category": "Bod",
-        "day": "2 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 6,
-    },
-    {
-        "id": "task-015",
-        "title": "Fjern sko, jakker og klær",
-        "category": "Bod",
-        "day": "2 dager før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 7,
-    },
-    {
-        "id": "task-016",
-        "title": "Fjern verdisaker (laptop, kabler)",
-        "category": "Bod",
-        "day": "2 dager før gjester ankommer",
-        "priority": "Kritisk",
-        "completed": False,
-        "notes": "",
-        "order": 8,
-    },
-    {
-        "id": "task-017",
-        "title": "Siste sjanse for full vask (klær, sengetøy, håndklær osv.)",
-        "category": "Soverom",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Kritisk",
-        "completed": False,
-        "notes": "",
-        "order": 1,
-    },
-    {
-        "id": "task-018",
-        "title": "Handle alt på handlelisten",
-        "category": "Alle rom",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Kritisk",
-        "completed": False,
-        "notes": "Shopping",
-        "order": 2,
-    },
-    {
-        "id": "task-019",
-        "title": "Vask dusjforheng",
-        "category": "Bad",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 3,
-    },
-    {
-        "id": "task-020",
-        "title": "Steam",
-        "category": "Bad",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 4,
-    },
-    {
-        "id": "task-021",
-        "title": "Fyll opp toalettsaker",
-        "category": "Bad",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 5,
-    },
-    {
-        "id": "task-022",
-        "title": "Støvsug sofa og puter",
-        "category": "Stue",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 6,
-    },
-    {
-        "id": "task-023",
-        "title": "Fjern PC",
-        "category": "Kjøkken",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 7,
-    },
-    {
-        "id": "task-024",
-        "title": "Mute alle Google-høyttalere",
-        "category": "Stue",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "",
-        "order": 8,
-    },
-    {
-        "id": "task-025",
-        "title": "Støvsug",
-        "category": "Alle rom",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Kritisk",
-        "completed": False,
-        "notes": "Hele leiligheten",
-        "order": 9,
-    },
-    {
-        "id": "task-026",
-        "title": "Støvtørk",
-        "category": "Alle rom",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "Hele leiligheten",
-        "order": 10,
-    },
-    {
-        "id": "task-027",
-        "title": "Vask overflater",
-        "category": "Alle rom",
-        "day": "1 dag før gjester ankommer",
-        "priority": "Normal",
-        "completed": False,
-        "notes": "Hele leiligheten",
-        "order": 11,
-    },
-]
+tasks = []
+
+task_id = 1
+order = 1
+
+
+def add_task(title, category, day, priority="Normal", notes="", assignee=""):
+    global task_id, order
+
+    tasks.append(
+        {
+            "id": f"task-{task_id:03}",
+            "title": title,
+            "category": category,
+            "day": day,
+            "priority": priority,
+            "completed": False,
+            "notes": notes,
+            "assignee": assignee,
+            "order": order,
+        }
+    )
+
+    task_id += 1
+    order += 1
+
+
+# Kjøkken
+add_task("Rydd kjøleskap", "Kjøkken", "2 dager før gjester ankommer", assignee="Meg")
+add_task("Rydd fryser", "Kjøkken", "2 dager før gjester ankommer", assignee="Meg")
+add_task("Rydd kjøkkenskap", "Kjøkken", "2 dager før gjester ankommer")
+add_task("Tøm oppvaskmaskin", "Kjøkken", "1 dag før gjester ankommer")
+add_task("Vask kjøleskap", "Kjøkken", "1 dag før gjester ankommer")
+add_task("Vask fryser", "Kjøkken", "1 dag før gjester ankommer")
+add_task("Vask kjøkkenskap", "Kjøkken", "1 dag før gjester ankommer")
+add_task("Vask overflater (inkl. skapdører)", "Kjøkken", "1 dag før gjester ankommer")
+add_task("Vask kjøkkenutstyr (skuff 1 og 2)", "Kjøkken", "1 dag før gjester ankommer")
+add_task("Vask fat og skåler", "Kjøkken", "1 dag før gjester ankommer")
+add_task("Vask kaffemaskin", "Kjøkken", "1 dag før gjester ankommer", notes="Rensevæske under vasken")
+add_task("Vask airfryer", "Kjøkken", "1 dag før gjester ankommer")
+
+
+# Stue
+add_task("Rydd", "Stue", "2 dager før gjester ankommer")
+add_task("Vask gulv", "Stue", "1 dag før gjester ankommer")
+add_task("Vask overflater (bord, benker, vinduskarmer og pult)", "Stue", "1 dag før gjester ankommer")
+add_task("Vask vinduer (ved behov)", "Stue", "1 dag før gjester ankommer")
+add_task("Støvsug sofa", "Stue", "1 dag før gjester ankommer")
+
+
+# Gang
+add_task("Rydd", "Gang", "3 dager før gjester ankommer")
+add_task("Vask gulv", "Gang", "1 dag før gjester ankommer")
+add_task("Vask overflater", "Gang", "1 dag før gjester ankommer")
+
+
+# Soverom
+add_task("Rydd", "Soverom", "2 dager før gjester ankommer")
+add_task("Vask gulv", "Soverom", "1 dag før gjester ankommer")
+add_task("Vask overflater", "Soverom", "1 dag før gjester ankommer")
+add_task("Vask vinduer (ved behov)", "Soverom", "1 dag før gjester ankommer")
+
+
+# Bad
+add_task("Rydd", "Bad", "2 dager før gjester ankommer")
+add_task("Rydd skap", "Bad", "2 dager før gjester ankommer")
+add_task("Rydd skap under vask", "Bad", "2 dager før gjester ankommer")
+add_task("Vask gulv", "Bad", "1 dag før gjester ankommer")
+add_task("Vask toalett", "Bad", "1 dag før gjester ankommer")
+add_task("Vask servant", "Bad", "1 dag før gjester ankommer")
+add_task("Vask skap", "Bad", "1 dag før gjester ankommer")
+add_task("Vask oppbevaringshylle", "Bad", "1 dag før gjester ankommer")
+add_task("Vask dusjområde", "Bad", "1 dag før gjester ankommer")
+add_task("Steam dusjområde", "Bad", "1 dag før gjester ankommer")
+add_task("Vask dusjforheng", "Bad", "1 dag før gjester ankommer")
+add_task("Fyll opp toalettsaker", "Bad", "1 dag før gjester ankommer")
+
+
+# Bod
+add_task(
+    "Fjern private klær",
+    "Bod",
+    "2 dager før gjester ankommer",
+    assignee="Meg"
+)
+
+add_task(
+    "Fjern verdisaker (alkohol, penger, nøkler, utility closet)",
+    "Bod",
+    "2 dager før gjester ankommer",
+    priority="Kritisk",
+    assignee="Meg"
+)
 
